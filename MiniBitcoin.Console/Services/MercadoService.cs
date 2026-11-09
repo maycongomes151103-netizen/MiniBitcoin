@@ -6,7 +6,7 @@ public class MercadoService
 {
     private readonly List<TransacaoHistorico> _historico = [];
 
-    public decimal CotacaoBtc { get; }
+    public decimal CotacaoBtc { get; private set; }
     public IReadOnlyList<TransacaoHistorico> Historico => _historico.AsReadOnly();
 
     public MercadoService(decimal cotacaoBtc)
@@ -17,6 +17,16 @@ public class MercadoService
         }
 
         CotacaoBtc = cotacaoBtc;
+    }
+
+    public void AtualizarCotacao(decimal novaCotacao)
+    {
+        if (novaCotacao <= 0)
+        {
+            throw new ArgumentException("A cotação do Bitcoin deve ser maior que zero.", nameof(novaCotacao));
+        }
+
+        CotacaoBtc = novaCotacao;
     }
 
     public void ComprarBtc(Carteira carteira, decimal quantidadeBtc)

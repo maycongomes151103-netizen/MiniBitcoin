@@ -56,4 +56,28 @@ public class TransacaoTests
         Assert.Throws<InvalidOperationException>(() => servico.VenderBtc(carteira, 1.0m));
         Assert.Empty(servico.Historico);
     }
+
+    [Fact]
+    public void Deve_Atualizar_Cotacao_Para_Valor_Positivo()
+    {
+        var carteira = new Carteira(100000m, 0m);
+        var servico = new MercadoService(cotacaoBtc: 50000m);
+
+        servico.AtualizarCotacao(60000m);
+        servico.ComprarBtc(carteira, 1m);
+
+        Assert.Equal(60000m, servico.CotacaoBtc);
+        Assert.Equal(40000m, carteira.SaldoBrl);
+        Assert.Equal(60000m, Assert.Single(servico.Historico).PrecoCotacao);
+    }
+
+    [Fact]
+    public void Nao_Deve_Atualizar_Cotacao_Com_Valor_Nao_Positivo()
+    {
+        var servico = new MercadoService(cotacaoBtc: 50000m);
+
+        Assert.Throws<ArgumentException>(() => servico.AtualizarCotacao(0m));
+        Assert.Throws<ArgumentException>(() => servico.AtualizarCotacao(-1m));
+        Assert.Equal(50000m, servico.CotacaoBtc);
+    }
 }
